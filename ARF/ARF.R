@@ -9,6 +9,9 @@ rm(list=ls())
 ## Load functions
 source("ARFfunctions.R")
 
+## Load Robjects for this script
+load("CaARF.RData")
+
 ## Dependencies
 library(dplyr)
 library(ggplot2)
@@ -115,16 +118,12 @@ t1 <- t1 %>% select(GeneID, XP, LOC, Chr, chr_s, chr_e, Strand, AA, mol_wt, exon
 
 head(t1)
 
-
-### -----------NOTA-----------------------------------------------------------
-####          Para usar en el markdown y borrar despues
-### -----------NOTA-----------------------------------------------------------
+### ----------------------------------------------------------------------
 # write.csv(t1, file = "t1.csv", row.names=FALSE)
 # t1 = read.csv("t1.csv")
-# 
+### ----------------------------------------------------------------------
 
-
-## Plot some data
+## Plot some general data
 boxplot(t1$exon, main = "ARF Family", ylab = "Exon number")
 stripchart(t1$exon, vertical = TRUE, method = "jitter", 
            add = TRUE, col = "grey70", pch = 19, cex = 0.9)
@@ -146,7 +145,8 @@ stripchart(t1$mol_wt, vertical = TRUE, method = "jitter",
 t1hmm = t1 %>% bind_cols(hmm = HMM)
 p = ggplot(t1hmm, aes(x = hmm, y = AA))
 
-## Figure MS S2B
+# -------------------------------------------------------------------------
+## Figure Manuscript S2B
 # -------------------------------------------------------------------------
 set.seed(12349)
 p + geom_jitter(alpha = .7, col="darkblue", width = 0.1) + 
@@ -156,7 +156,8 @@ p + geom_jitter(alpha = .7, col="darkblue", width = 0.1) +
          x = "", y = "Length aa")
 
 
-## Figure MS 2SA
+# -------------------------------------------------------------------------
+## Figure Manuscript S2A
 # -------------------------------------------------------------------------
 q = ggplot(t1p, aes(x = Chr, y = AA))
 
@@ -173,7 +174,8 @@ q + geom_point(alpha = .8, col= "darkblue") +
 with(Imodels, boxplot(Identity~Species))
 
 # ggplot
-## Figure MS S3
+# -------------------------------------------------------------------------
+## Figure Manuscript S3
 # -------------------------------------------------------------------------
 p <- ggplot(Imodels, aes(Species, Identity))
 p + geom_boxplot() + ylab("Amino acid Identity (%)") + 
@@ -276,13 +278,12 @@ mr_domain <- mr_domain %>% select(c(1:5,11))
 ##                    GRanges object
 ## -----------------------------------------------------------------------------
 
-
 # Negative widths are not allowed by IRanges, so let's define the true coordinates
 # and build a new data frame, which is the input for the function 'makeGRangesFromDataFrame'
 
 tgr <- t1 %>%  mutate(Cstart = ifelse(t1$chr_s > t1$chr_e, t1$chr_e, t1$chr_s), 
                       Cend = ifelse(t1$chr_s < t1$chr_e, t1$chr_e, t1$chr_s)) %>% 
-    select(GeneID, Chr, Strand, Cstart, Cend)
+                      select(GeneID, Chr, Strand, Cstart, Cend)
 
 tgr <- makeGRangesFromDataFrame(tgr, start.field = "Cstart", end.field = "Cend", 
                                 strand.field = "Strand", ignore.strand = F, 
@@ -295,14 +296,6 @@ seqinfo(tgr)
 
 # Change strand of the unmapped ARF
 strand(tgr[24]) = "*"
-
-## ------------------------------------------------------------------------
-## ------------------------------------------------------------------------
-## ------------------------------------------------------------------------
-####                 HACER EL BED FILE
-## ------------------------------------------------------------------------
-## ------------------------------------------------------------------------
-## ------------------------------------------------------------------------
 
 
 ## ------------------------------------------------------------------------
@@ -357,7 +350,7 @@ sort(table(t1$Chr), decreasing = TRUE)
 # (or goodness of fit test); this test will take the distribution of proteins by 
 # chromosome and see if the distribution we have is consistent with a given 
 # hypothesis, to within random sampling error. For example, could we have gotten 
-# this distribution of proteins just by chance, or do Ca7 really has more proteins?
+# this distribution of proteins just by chance, or do some chrs really have more proteins?
 # This kind of test can be done with any kind of expected frequencies, but first we 
 # will compare against the hypothesis of equal expected frequencies, i.e. the 
 # hypothesis that Chrs contains  ARF proteins at the same rate and we got 
@@ -389,8 +382,6 @@ sort(table(t1$Chr), decreasing = TRUE)
 
 
 
-
-
 ## -----------------------------------------------------------------------------
 ##         Reference Genes: stability values for qPCR normalization
 ## -----------------------------------------------------------------------------
@@ -404,7 +395,9 @@ color = c(rep("gray",2),"gray20")
 
 # par(mfrow=c(1,2))
 
-## Figure MS S1A
+## -----------------------------------------------------------------------------
+## Figure Manuscript S1A
+## -----------------------------------------------------------------------------
 # setEPS()
 # plotting code
 norm1 %>% ggplot(aes(x=genes, y=M, fill=genes)) +
@@ -417,7 +410,9 @@ norm1 %>% ggplot(aes(x=genes, y=M, fill=genes)) +
 # postscript("qBase1.eps")
 # dev.off()
 
+## -----------------------------------------------------------------------------
 ## Figure MS S1B
+## -----------------------------------------------------------------------------
 # setEPS()
 # plotting code
 norm2 %>% ggplot(aes(x=genes, y=M, fill=genes)) +
@@ -435,5 +430,5 @@ norm2 %>% ggplot(aes(x=genes, y=M, fill=genes)) +
 
 
 #############################
-save('ARFblastHit.csv', mr, HMM, clades, Imodels, qbaseCVdat, file = "CaARF.RData")
-load("CaARF.RData")
+# save(mr, HMM, clades, Imodels, qbaseCVdat, file = "CaARF.RData")
+# load("CaARF.RData")
