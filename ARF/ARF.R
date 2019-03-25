@@ -46,7 +46,7 @@ for(xi in as.character(xp$XP)) {
   
   xplink <- entrez_link(dbfrom = "protein", id = xi, db = "gene")
   genesummary = entrez_summary(db = "gene", id = xplink$links[1])
-  LOC = c(LOC, genesummary$name)
+  LOC = c(LOC, paste0("LOC",genesummary$uid))
   Chr = c(Chr, genesummary$chromosome)
   
   # defensive programming
