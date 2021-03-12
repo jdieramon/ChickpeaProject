@@ -1,6 +1,4 @@
 ## Publications
-List of reference papers in chickpea genome sequence and/or computational biology. 
-
 This is a list of publications that I use as reference in my research. 
 
 ## A. Chickpea reference genome
